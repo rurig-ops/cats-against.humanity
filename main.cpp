@@ -1,50 +1,78 @@
 #include <iostream>
-#include <array>
+#include "clase.h"
+#include <limits>
+using namespace std;
 
 int main() {
-    std::cout << "Hello, world!\n";
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
-    /////////////////////////////////////////////////////////////////////////
-    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-    /// dați exemple de date de intrare folosind fișierul tastatura.txt
-    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-    /// pentru cât mai multe ramuri de execuție.
-    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-    ///
-    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-    /// pentru a simula date introduse de la tastatură.
-    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-    ///
-    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-    /// program care merg (și să le evitați pe cele care nu merg).
-    ///
-    /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
+    Cat cat1("Magu", 50, 80, 30, 80);
+    Cat cat2("Dracat Mihaita", 80, 20, 60, 50);
+    Cat cat3("Lucius", 30, 90, 20, 90);
+    Cat cat4("Sebi");
+
+    // Constructor copiere și operator=
+    //Cat copyCat = cat1;
+   // Cat assignedCat("Temp");
+    //assignedCat = cat2;
+
+    CatOverlord overlord;
+    overlord.addCat(cat1);
+    overlord.addCat(cat2);
+    overlord.addCat(cat3);
+    overlord.addCat(cat4);
+   // overlord.addCat(copyCat);
+   // overlord.addCat(assignedCat);
+
+    Humanity humans;
+
+    bool gameEnd = false;
+    while (!gameEnd) {
+        cout << "\n stats \n";
+        overlord.printStatus();
+        overlord.sortCatsByEvilness();
+        overlord.printCats();
+        cout << humans << endl;
+
+        cout << "\nChoose action:\n"<< "1. Feed a cat\n"<< "2. Encourage a cat\n"<< "3. Train cat Evilness\n"<< "4. Send cat on mission\n"
+             << "5. Next day\n"<< "6. Take cat to yoga\n"<< "7. Quit\n> ";
+        int choice;
+        cin >> choice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice) {
+            case 1:
+                overlord.feedCatInteractive();
+                break;
+            case 2:
+                overlord.encourageCatInteractive();
+                break;
+            case 3:
+                overlord.trainCatEvilInteractive();
+                if (overlord.checkEvilnessGameOver()) gameEnd = true;
+                break;
+            case 4:
+                overlord.sendOnMissionInteractive(humans);
+                break;
+            case 5:
+                overlord.nextDay();
+                cout << "Day advanced.\n";
+                break;
+            case 6:
+                overlord.calmCatInteractive();
+                break;
+            case 7:
+                gameEnd = true;
+                break;
+            default:
+                cout << "Invalid choice!\n";
+                break;
+        }
+
+        if (humans.isGameOver()) {
+            cout << "Game Over! Humans discovered the cat conspiracy!\n";
+            break;
+        }
     }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
-    }
-    ///////////////////////////////////////////////////////////////////////////
-    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-    /// alt fișier propriu cu ce alt nume doriți.
-    /// Exemplu:
-    /// std::ifstream fis("date.txt");
-    /// for(int i = 0; i < nr2; ++i)
-    ///     fis >> v2[i];
-    ///
-    ///////////////////////////////////////////////////////////////////////////
+
+    cout << "Thanks for playing! :3\n";
     return 0;
 }
