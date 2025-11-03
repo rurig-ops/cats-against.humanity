@@ -1,6 +1,6 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Cats against humanity
 
-### Folosiți template-ul corespunzător grupei voastre!
+Cats against humanity este un joc inspirat de Cult of the Lamb și Fallout Shelter. Acesta urmărește o societate de pisici ce trebuie să facă diferite misiuni pentru a pune stăpânire pe umanitate, dar trebuie să-și balanseze nivelul de evilness cu cel de cuteness pentru a nu fi prinse de oameni. Jucătorul, liderul societății, trebuie să mențină membrii bine hrăniți și loiali, dar și să îi trimită în misiuni pentru a răspândi haos.
 
 | Laborant  | Link template                                |
 |-----------|----------------------------------------------|
