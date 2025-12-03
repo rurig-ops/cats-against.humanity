@@ -232,6 +232,7 @@ RecruitCatsAction::RecruitCatsAction(CatOverlord* o) : overlord(o) {}
 
 void RecruitCatsAction::execute(Cat& c, Humanity& h) {
     if (!overlord) return;
+    (void)h;
     static int id = 1;
     Cat newCat("NewCat#" + to_string(id++));
     overlord->addCat(newCat);
