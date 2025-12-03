@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <exception>
 using namespace std;
 
 //                                        :3
@@ -25,11 +26,11 @@ public:
     Cat& operator=(const Cat& other);
     friend ostream& operator<<(ostream& os, const Cat& c);
 
-    [[nodiscard]]const string& getName() const;
-    [[nodiscard]]int getEvilness() const;
-    [[nodiscard]]int getCuteness() const;
-    [[nodiscard]]int getHunger() const;
-    [[nodiscard]]int getLoyalty() const;
+    [[nodiscard]] const string& getName() const;
+    [[nodiscard]] int getEvilness() const;
+    [[nodiscard]] int getCuteness() const;
+    [[nodiscard]] int getHunger() const;
+    [[nodiscard]] int getLoyalty() const;
 
     void feed(int cant);
     void trainEvil(int cant);
@@ -52,7 +53,7 @@ public:
     void increaseSuspicion(int val);
     void decreaseSuspicion(int val);
 
-    [[nodiscard]]bool isGameOver() const;
+    [[nodiscard]] bool isGameOver() const;
 
     friend ostream& operator<<(ostream& os, const Humanity& h);
 };
@@ -76,14 +77,14 @@ private:
 
 public:
     Mission(const string& n, int diff, int money, int chaos, int hunger, int minE, int minL, int minC, MissionType t);
-    [[nodiscard]]const string& getName() const { return name; }
-    [[nodiscard]]int getRewardMoney() const { return rewardMoney; }
-    [[nodiscard]]int getRewardChaos() const { return rewardChaos; }
-    [[nodiscard]]int getHungerCost() const { return hungerCost; }
-    [[nodiscard]]int getDifficulty() const { return difficulty; }
-    [[nodiscard]]MissionType getType() const { return type; }
+    [[nodiscard]] const string& getName() const { return name; }
+    [[nodiscard]] int getRewardMoney() const { return rewardMoney; }
+    [[nodiscard]] int getRewardChaos() const { return rewardChaos; }
+    [[nodiscard]] int getHungerCost() const { return hungerCost; }
+    [[nodiscard]] int getDifficulty() const { return difficulty; }
+    [[nodiscard]] MissionType getType() const { return type; }
 
-    [[nodiscard]]bool attempt(const Cat& c) const;
+    [[nodiscard]] bool attempt(const Cat& c) const;
 
     friend ostream& operator<<(ostream& os, const Mission& m);
 };
@@ -158,5 +159,36 @@ public:
     unique_ptr<CatAction> clone() const override;
 };
 
+//                                                                                :3
+class GameException : public exception {
+protected:
+    string message;
+public:
+    explicit GameException(string msg) : message(move(msg)) {}
+    const char* what() const noexcept override { return message.c_str(); }
+};
+
+// Erori legate de indexul pisicii
+class InvalidCatIndexException : public GameException {
+public:
+    explicit InvalidCatIndexException(int index)
+        : GameException("Invalid cat index: " + to_string(index)) {}
+};
+
+// Erori legate de bani insuficienți
+class NotEnoughMoneyException : public GameException {
+public:
+    explicit NotEnoughMoneyException(int cost, int money)
+        : GameException("Not enough money! Needed: " + to_string(cost) +
+                        ", Available: " + to_string(money)) {}
+};
+
+// Erori legate de puncte de acțiune insuficiente
+class NotEnoughAPException : public GameException {
+public:
+    explicit NotEnoughAPException(int needed, int available)
+        : GameException("Not enough action points! Needed: " + to_string(needed) +
+                        ", Available: " + to_string(available)) {}
+};
 
 #endif
