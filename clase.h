@@ -164,7 +164,7 @@ class GameException : public exception {
 protected:
     string message;
 public:
-    explicit GameException(string msg) : message(move(msg)) {}
+    explicit GameException(string msg) : message(std::move(msg)) {}
     const char* what() const noexcept override { return message.c_str(); }
 };
 
