@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
+#include <memory>
 using namespace std;
 
 //                                        :3
@@ -119,6 +121,42 @@ public:
     bool checkEvilnessGameOver();
 
     void calmCatInteractive();
+
+    vector<Cat>& getCats() { return cats; }
 };
+
+//                                         :3
+class CatAction {
+public:
+    virtual ~CatAction() = default;
+    virtual void execute(Cat& c, Humanity& h) = 0;
+    virtual string name() const = 0;
+    virtual unique_ptr<CatAction> clone() const = 0;
+};
+
+class StealFoodAction : public CatAction {
+public:
+    void execute(Cat& c, Humanity& h) override;
+    string name() const override;
+    unique_ptr<CatAction> clone() const override;
+};
+
+class SpreadChaosAction : public CatAction {
+public:
+    void execute(Cat& c, Humanity& h) override;
+    string name() const override;
+    unique_ptr<CatAction> clone() const override;
+};
+
+class RecruitCatsAction : public CatAction {
+private:
+    CatOverlord* overlord;
+public:
+    explicit RecruitCatsAction(CatOverlord* o);
+    void execute(Cat& c, Humanity& h) override;
+    string name() const override;
+    unique_ptr<CatAction> clone() const override;
+};
+
 
 #endif

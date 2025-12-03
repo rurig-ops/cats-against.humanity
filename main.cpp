@@ -1,6 +1,9 @@
 #include <iostream>
-#include "clase.h"
+#include <vector>
+#include <memory>
 #include <limits>
+#include "clase.h"
+
 using namespace std;
 
 int main() {
@@ -9,31 +12,34 @@ int main() {
     Cat cat3("Lucius", 30, 90, 20, 90);
     Cat cat4("Sebi");
 
-    // Constructor copiere și operator=
-    //Cat copyCat = cat1;
-   // Cat assignedCat("Temp");
-    //assignedCat = cat2;
-
     CatOverlord overlord;
     overlord.addCat(cat1);
     overlord.addCat(cat2);
     overlord.addCat(cat3);
     overlord.addCat(cat4);
-   // overlord.addCat(copyCat);
-   // overlord.addCat(assignedCat);
 
     Humanity humans;
 
     bool gameEnd = false;
     while (!gameEnd) {
-        cout << "\n stats \n";
+        // Afisare status general
+        cout << "\n=== Current Stats ===\n";
         overlord.printStatus();
         overlord.sortCatsByEvilness();
         overlord.printCats();
         cout << humans << endl;
 
-        cout << "\nChoose action:\n"<< "1. Feed a cat\n"<< "2. Encourage a cat\n"<< "3. Train cat Evilness\n"<< "4. Send cat on mission\n"
-             << "5. Next day\n"<< "6. Take cat to yoga\n"<< "7. Quit\n> ";
+        // Meniu complet integrat
+        cout << "\nChoose action:\n"
+             << "1. Feed a cat\n"
+             << "2. Encourage a cat\n"
+             << "3. Train cat Evilness\n"
+             << "4. Send cat on mission\n"
+             << "5. Next day\n"
+             << "6. Take cat to yoga\n"
+             << "7. Cat special action\n"
+             << "8. Quit\n> ";
+
         int choice;
         cin >> choice;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -59,7 +65,36 @@ int main() {
             case 6:
                 overlord.calmCatInteractive();
                 break;
-            case 7:
+            case 7: { // Cat special action
+                int index;
+                cout << "Select cat index to perform action: ";
+                cin >> index;
+                if (index < 0 || index >= (int)overlord.getCats().size()) {
+                    cout << "Invalid index!\n";
+                    break;
+                }
+
+                vector<unique_ptr<CatAction>> actions;
+                actions.push_back(make_unique<StealFoodAction>());
+                actions.push_back(make_unique<SpreadChaosAction>());
+                actions.push_back(make_unique<RecruitCatsAction>(&overlord));
+
+                cout << "Select action:\n";
+                for (size_t i = 0; i < actions.size(); i++) {
+                    cout << i + 1 << ". " << actions[i]->name() << "\n";
+                }
+
+                int actChoice;
+                cin >> actChoice;
+                if (actChoice < 1 || actChoice > (int)actions.size()) {
+                    cout << "Invalid action choice!\n";
+                    break;
+                }
+
+                actions[actChoice - 1]->execute(overlord.getCats()[index], humans);
+                break;
+            }
+            case 8:
                 gameEnd = true;
                 break;
             default:
