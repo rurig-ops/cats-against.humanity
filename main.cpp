@@ -18,6 +18,8 @@ int main() {
     overlord.addCat(cat3);
     overlord.addCat(cat4);
 
+    cout << "DEBUG: cats.size() = " << overlord.getCats().size() << endl;
+
     Humanity humans;
 
     bool gameEnd = false;
