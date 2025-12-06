@@ -121,6 +121,30 @@ CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     actions.push_back(make_unique<SendToSpaAction>());
 }
 
+// COPY CONSTRUCTOR
+CatOverlord::CatOverlord(const CatOverlord& other)
+    : cats(other.cats),
+      money(other.money),
+      chaosPoints(other.chaosPoints),
+      actionPoints(other.actionPoints)
+{
+    // clonăm acțiunile
+    actions.clear();
+    for (const auto& a : other.actions) {
+        actions.push_back(a->clone());
+    }
+}
+
+// OPERATOR= CU COPY-AND-SWAP
+CatOverlord& CatOverlord::operator=(CatOverlord other) {
+    swap(cats, other.cats);
+    swap(actions, other.actions);
+    swap(money, other.money);
+    swap(chaosPoints, other.chaosPoints);
+    swap(actionPoints, other.actionPoints);
+    return *this;
+}
+
 void CatOverlord::addCat(const Cat& c) {
     cats.push_back(c);
 }

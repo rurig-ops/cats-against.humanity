@@ -135,6 +135,8 @@ public:
 
     size_t getNumActions() { return actions.size(); }
     vector<unique_ptr<CatAction>>& getActions() { return actions; }
+    CatOverlord(const CatOverlord& other);
+    CatOverlord& operator=(CatOverlord other); // copy-and-swap
 };
 
 class StealFoodAction : public CatAction {
