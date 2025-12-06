@@ -292,6 +292,7 @@ void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
 
     // DOWNCAST demonstrativ
     if (auto recruit = dynamic_cast<RecruitCatsAction*>(a)) {
+        (void)recruit;
         cout << "Detected RecruitCatsAction! This action can recruit new cats.\n";
     }
 
