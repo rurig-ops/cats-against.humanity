@@ -78,11 +78,7 @@ public:
     [[nodiscard]] int getRewardMoney() const { return rewardMoney; }
     [[nodiscard]] int getRewardChaos() const { return rewardChaos; }
     [[nodiscard]] int getHungerCost() const { return hungerCost; }
-    [[nodiscard]] int getDifficulty() const { return difficulty; }
     [[nodiscard]] MissionType getType() const { return type; }
-    [[nodiscard]]int getMinEvilness() const { return minEvilness; }
-    [[nodiscard]]int getMinLoyalty() const { return minLoyalty; }
-    [[nodiscard]]int getMinCuteness() const { return minCuteness; }
 
     [[nodiscard]]bool attempt(const Cat& c) const;
 
