@@ -5,19 +5,10 @@
 using namespace std;
 
 // :3 Cat
-
-Cat::Cat(string n, int e, int c, int h, int l)
-    : name(n), evilness(e), cuteness(c), hunger(h), loyalty(l) {}
-
-Cat::Cat(string n)
-    : name(n), evilness(25), cuteness(25), hunger(50), loyalty(10) {}
-
-Cat::Cat(const Cat &other)
-    : name(other.name), evilness(other.evilness), cuteness(other.cuteness),
-      hunger(other.hunger), loyalty(other.loyalty) {}
-
+Cat::Cat(string n, int e, int c, int h, int l) : name(n), evilness(e), cuteness(c), hunger(h), loyalty(l) {}
+Cat::Cat(string n) : name(n), evilness(25), cuteness(25), hunger(50), loyalty(10) {}
+Cat::Cat(const Cat &other) : name(other.name), evilness(other.evilness), cuteness(other.cuteness), hunger(other.hunger), loyalty(other.loyalty) {}
 Cat::~Cat() {}
-
 Cat& Cat::operator=(const Cat& other) {
     if (this != &other) {
         name = other.name;
@@ -71,23 +62,19 @@ void Cat::decreaseEvilness(int amount) {
     if (evilness < 0) evilness = 0;
 }
 
-void Cat::pamper(int amount) {
+void Cat::increaseCuteness(int amount) {
     cuteness += amount;
     if (cuteness > 100) cuteness = 100;
-    cout << name << " went to the spa! Cuteness: " << cuteness << endl;
 }
 
 // :3 Humanity
-
-Humanity::Humanity(int start, int maxS)
-    : suspicion(start), maxSuspicion(maxS) {}
+Humanity::Humanity(int start, int maxS) : suspicion(start), maxSuspicion(maxS) {}
 
 void Humanity::increaseSuspicion(int val) {
     suspicion += val;
     if (suspicion > maxSuspicion) suspicion = maxSuspicion;
     cout << "Human suspicion increased: " << suspicion << "/" << maxSuspicion << endl;
-    if (isGameOver())
-        cout << "Humans discovered the cat conspiracy! Game Over!" << endl;
+    if (isGameOver()) cout << "Humans discovered the cat conspiracy! Game Over!" << endl;
 }
 
 void Humanity::decreaseSuspicion(int val) {
@@ -106,7 +93,6 @@ ostream& operator<<(ostream& os, const Humanity& h) {
 }
 
 // :3 Mission
-
 Mission::Mission(const string& n, int diff, int money, int chaos, int hunger, int minE, int minL, int minC, MissionType t)
     : name(n), difficulty(diff), rewardMoney(money), rewardChaos(chaos), hungerCost(hunger),
       minEvilness(minE), minLoyalty(minL), minCuteness(minC), type(t) {}
@@ -127,13 +113,12 @@ ostream& operator<<(ostream& os, const Mission& m) {
 }
 
 // :3 CatOverlord
-
 CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
-    : money(startMoney), chaosPoints(startChaos), actionPoints(startAP)
-{
+    : money(startMoney), chaosPoints(startChaos), actionPoints(startAP) {
     actions.push_back(make_unique<StealFoodAction>());
     actions.push_back(make_unique<SpreadChaosAction>());
     actions.push_back(make_unique<RecruitCatsAction>(this));
+    actions.push_back(make_unique<SendToSpaAction>());
 }
 
 void CatOverlord::addCat(const Cat& c) {
@@ -141,12 +126,9 @@ void CatOverlord::addCat(const Cat& c) {
 }
 
 void CatOverlord::feedCat(int i, int cant) {
-    if (actionPoints <= 0)
-        throw NotEnoughAPException(1, actionPoints);
-    if (i < 0 || i >= (int)cats.size())
-        throw InvalidCatIndexException(i);
-    if (cant > money)
-        throw NotEnoughMoneyException(cant, money);
+    if (actionPoints <= 0) throw NotEnoughAPException(1, actionPoints);
+    if (i < 0 || i >= (int)cats.size()) throw InvalidCatIndexException(i);
+    if (cant > money) throw NotEnoughMoneyException(cant, money);
 
     cats[i].feed(cant);
     money -= cant;
@@ -154,251 +136,171 @@ void CatOverlord::feedCat(int i, int cant) {
 }
 
 void CatOverlord::encourageCat(int i, int cant) {
-    if (actionPoints <= 0)
-        throw NotEnoughAPException(1, actionPoints);
-    if (i < 0 || i >= (int)cats.size())
-        throw InvalidCatIndexException(i);
+    if (actionPoints <= 0) throw NotEnoughAPException(1, actionPoints);
+    if (i < 0 || i >= (int)cats.size()) throw InvalidCatIndexException(i);
 
     cats[i].rewardLoyalty(cant);
     actionPoints--;
 }
 
 void CatOverlord::trainCatEvil(int i, int cant) {
-    if (actionPoints <= 0)
-        throw NotEnoughAPException(1, actionPoints);
-    if (i < 0 || i >= (int)cats.size())
-        throw InvalidCatIndexException(i);
-    if (cant > money)
-        throw NotEnoughMoneyException(cant, money);
+    if (actionPoints <= 0) throw NotEnoughAPException(1, actionPoints);
+    if (i < 0 || i >= (int)cats.size()) throw InvalidCatIndexException(i);
+    if (cant > money) throw NotEnoughMoneyException(cant, money);
 
     cats[i].trainEvil(cant);
     money -= cant;
     actionPoints--;
 }
 
-// interactive methods
+void CatOverlord::sendCatToSpa(int i, int cost) {
+    if (actionPoints <= 0) throw NotEnoughAPException(1, actionPoints);
+    if (i < 0 || i >= (int)cats.size()) throw InvalidCatIndexException(i);
+    if (cost > money) throw NotEnoughMoneyException(cost, money);
+
+    cats[i].decreaseEvilness(5);
+    cats[i].increaseCuteness(15);
+    cout << cats[i].getName() << " enjoyed the spa! Evilness down, cuteness up." << endl;
+
+    money -= cost;
+    actionPoints--;
+}
+
+// interactive
 void CatOverlord::feedCatInteractive() {
     int index, cant;
-    cout << "Which cat to feed? ";
-    cin >> index;
-    cout << "How much? ";
-    cin >> cant;
+    cout << "Which cat to feed? "; cin >> index;
+    cout << "How much? "; cin >> cant;
     feedCat(index, cant);
 }
 
 void CatOverlord::encourageCatInteractive() {
     int index, cant;
-    cout << "Which cat to encourage? ";
-    cin >> index;
-    cout << "How much? ";
-    cin >> cant;
+    cout << "Which cat to encourage? "; cin >> index;
+    cout << "How much? "; cin >> cant;
     encourageCat(index, cant);
 }
 
 void CatOverlord::trainCatEvilInteractive() {
     int index, cant;
-    cout << "Which cat to train evilly? ";
-    cin >> index;
-    cout << "How much? ";
-    cin >> cant;
+    cout << "Which cat to train evilly? "; cin >> index;
+    cout << "How much? "; cin >> cant;
     trainCatEvil(index, cant);
 }
 
-// :3 CatOverlord::sendOnMissionInteractive
-void CatOverlord::sendOnMissionInteractive(Humanity& humans) {
-    if (actionPoints <= 0)
-        throw NotEnoughAPException(1, actionPoints);
+void CatOverlord::sendOnMissionInteractive(Humanity& h) {
+    if (cats.empty()) return;
+    int index; cout << "Select cat for mission: "; cin >> index;
+    if (index < 0 || index >= (int)cats.size()) throw InvalidCatIndexException(index);
 
-    if (cats.empty()) {
-        cout << "No cats available for missions!" << endl;
-        return;
-    }
-
-    // afișăm pisicile
-    cout << "Select a cat for the mission:" << endl;
-    for (size_t i = 0; i < cats.size(); ++i)
-        cout << i << ": " << cats[i] << endl;
-
-    int catIndex;
-    cin >> catIndex;
-    if (catIndex < 0 || catIndex >= (int)cats.size())
-        throw InvalidCatIndexException(catIndex);
-
-    Cat& c = cats[catIndex];
-
-    // definim misiunile PR
-    struct PRMission {
-        string name;
-        int requiredCuteness;
-        int suspicionDecrease;
-        int failSuspicionIncrease;
-        int rewardMoney;
-        string successMsg;
-        string failMsg;
+    // Example missions for demo
+    vector<Mission> prMissions = {
+        {"Make a brainrot TikTok", 1, 25, 0, 10, 0, 0, 15, Mission::PR},
+        {"Make AI Facebook post", 2, 50, 0, 10, 0, 0, 25, Mission::PR}
     };
-    vector<PRMission> prMissions = {
-        {"Make a brainrot TikTok", 15, 25, 22, 30,
-         "Success! The kids loved this one. It's becoming the new Italian brainrot",
-         "Phew that video sucked. Never attempt editing again"},
-        {"Make AI Facebook post", 0, 35, 44, 50,
-         "Success! The post reached old people's feeds",
-         "Even the grandparents figured out it's AI and they're suing you now"}
+    vector<Mission> evilMissions = {
+        {"Steal everyone's left sock", 1, 0, 25, 10, 0, 0, 0, Mission::EVIL},
+        {"Steal the laser from Magurele", 2, 0, 50, 10, 80, 0, 0, Mission::EVIL}
     };
 
-    // definim misiunile EVIL
-    struct EvilMission {
-        string name;
-        int requiredEvilness;
-        int chaosIncrease;
-        int failSuspicionIncrease;
-        string successMsg;
-        string failMsg;
-    };
-    vector<EvilMission> evilMissions = {
-        {"Steal everyone's left sock", 0, 25, 33,
-         "The sock collection is growing",
-         "You have disappointed the sock lovers in the cat society"},
-        {"Steal the laser from Magurele", 80, 50, 67,
-         "The cats will enjoy this laser",
-         "Cojocariu will remember this"}
-    };
+    int missionType; cout << "Select mission type (0=PR, 1=EVIL): "; cin >> missionType;
+    int missionIndex;
+    if (missionType == 0) {
+        for (size_t i = 0; i < prMissions.size(); ++i) cout << i << ": " << prMissions[i].getName() << endl;
+        cout << "Select mission index: "; cin >> missionIndex;
+        if (missionIndex < 0 || missionIndex >= (int)prMissions.size()) return;
 
-    cout << "Choose mission type:\n1. PR Mission\n2. Evil Mission\n";
-    int typeChoice;
-    cin >> typeChoice;
+        Mission& m = prMissions[missionIndex];
+        Cat& c = cats[index];
 
-    actionPoints-=2;
-    c.increaseHunger(10);
-
-    if (typeChoice == 1) {
-        cout << "Select PR mission:\n";
-        for (size_t i = 0; i < prMissions.size(); ++i)
-            cout << i << ". " << prMissions[i].name << endl;
-        int mIndex;
-        cin >> mIndex;
-        if (mIndex < 0 || mIndex >= (int)prMissions.size()) {
-            cout << "Invalid mission index" << endl;
-            actionPoints++; // restituim AP
-            return;
-        }
-        PRMission& m = prMissions[mIndex];
-        if (c.getCuteness() >= m.requiredCuteness) {
-            humans.decreaseSuspicion(m.suspicionDecrease);
-            money += m.rewardMoney;       // primim bani
-            cout << m.successMsg << " You earned $" << m.rewardMoney << "!" << endl;
+        if (c.getCuteness() >= m.getMinCuteness()) {
+            cout << "Success! ";
+            if (missionIndex == 0) cout << "The kids loved this one. It's becoming the new Italian brainrot.\n";
+            else cout << "The post reached old people's feeds!\n";
+            h.decreaseSuspicion( missionIndex == 0 ? 25 : 35 );
+            money += m.getRewardMoney();
         } else {
-            humans.increaseSuspicion(m.failSuspicionIncrease);
-            cout << m.failMsg << endl;
-        }
-    } else if (typeChoice == 2) {
-        cout << "Select Evil mission:\n";
-        for (size_t i = 0; i < evilMissions.size(); ++i)
-            cout << i << ". " << evilMissions[i].name << endl;
-        int mIndex;
-        cin >> mIndex;
-        if (mIndex < 0 || mIndex >= (int)evilMissions.size()) {
-            cout << "Invalid mission index" << endl;
-            actionPoints++; // restituim AP
-            return;
-        }
-        EvilMission& m = evilMissions[mIndex];
-        if (c.getEvilness() >= m.requiredEvilness) {
-            chaosPoints += m.chaosIncrease;
-            cout << m.successMsg << endl;
-        } else {
-            humans.increaseSuspicion(m.failSuspicionIncrease);
-            cout << m.failMsg << endl;
+            cout << "Fail! ";
+            if (missionIndex == 0) cout << "Phew, that video sucked. Never attempt editing again.\n";
+            else cout << "Even the grandparents figured out it's AI and they are suing you now.\n";
+            h.increaseSuspicion( missionIndex == 0 ? 22 : 44 );
         }
     } else {
-        cout << "Invalid mission type" << endl;
-        actionPoints++; // dacă alegerea invalidă, restituim AP
+        for (size_t i = 0; i < evilMissions.size(); ++i) cout << i << ": " << evilMissions[i].getName() << endl;
+        cout << "Select mission index: "; cin >> missionIndex;
+        if (missionIndex < 0 || missionIndex >= (int)evilMissions.size()) return;
+
+        Mission& m = evilMissions[missionIndex];
+        Cat& c = cats[index];
+
+        if (c.getEvilness() >= m.getMinEvilness()) {
+            cout << "Success! ";
+            if (missionIndex == 0) cout << "The sock collection is growing.\n";
+            else cout << "The cats will enjoy this laser.\n";
+            chaosPoints += m.getRewardChaos();
+        } else {
+            cout << "Fail! ";
+            if (missionIndex == 0) cout << "You have disappointed the sock lovers in the cat society.\n";
+            else cout << "Cojocariu will remember this.\n";
+            h.increaseSuspicion( missionIndex == 0 ? 33 : 67 );
+        }
     }
-}
 
-void CatOverlord::sendCatToSpaInteractive() {
-    int index, amount;
-    cout << "Which cat to send to the spa? ";
-    cin >> index;
-    cout << "How much pampering? ";
-    cin >> amount;
-
-    if (actionPoints <= 0)
-        throw NotEnoughAPException(1, actionPoints);
-    if (index < 0 || index >= (int)cats.size())
-        throw InvalidCatIndexException(index);
-
-    cats[index].pamper(amount);
+    cats[index].increaseHunger(10);
     actionPoints--;
 }
 
-
-void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
-    if (catIndex < 0 || catIndex >= (int)cats.size())
-        throw InvalidCatIndexException(catIndex);
-    if (actionIndex < 0 || actionIndex >= (int)actions.size()) {
-        cout << "Invalid action index\n";
-        return;
-    }
-
-    cout << "Cat " << cats[catIndex].getName()
-         << " is performing action: " << actions[actionIndex]->name() << "\n";
-
-    actions[actionIndex]->perform(cats[catIndex], h);
+void CatOverlord::calmCatInteractive() {
+    int index;
+    cout << "Which cat to calm at spa? "; cin >> index;
+    sendCatToSpa(index, 15);
 }
 
 void CatOverlord::nextDay() {
     actionPoints = 3;
-    for (auto &c : cats)
-        c.increaseHunger(5);
+    for (auto& c : cats) c.increaseHunger(5);
 }
 
 void CatOverlord::printStatus() const {
-    cout << "Money: " << money
-         << " | Chaos: " << chaosPoints
-         << " | AP: " << actionPoints << endl;
+    cout << "Money: " << money << " | Chaos: " << chaosPoints << " | AP: " << actionPoints << endl;
 }
 
 void CatOverlord::printCats() const {
-    for (size_t i = 0; i < cats.size(); ++i)
-        cout << i << ": " << cats[i] << endl;
+    for (size_t i = 0; i < cats.size(); ++i) cout << i << ": " << cats[i] << endl;
 }
 
 void CatOverlord::sortCatsByEvilness() {
-    sort(cats.begin(), cats.end(), [](const Cat &a, const Cat &b) {
-        return a.getEvilness() > b.getEvilness();
-    });
+    sort(cats.begin(), cats.end(), [](const Cat &a, const Cat &b){ return a.getEvilness() > b.getEvilness(); });
+}
+
+void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
+    if (catIndex < 0 || catIndex >= (int)cats.size()) throw InvalidCatIndexException(catIndex);
+    if (actionIndex < 0 || actionIndex >= (int)actions.size()) return;
+    actions[actionIndex]->perform(cats[catIndex], h);
 }
 
 // :3 StealFoodAction
-
 StealFoodAction::StealFoodAction() = default;
-
 void StealFoodAction::execute(Cat& c, Humanity& h) {
-    cout << c.getName() << " is stealing food symbolically.\n";
+    cout << c.getName() << " is stealing food.\n";
     c.trainEvil(3);
     h.increaseSuspicion(5);
 }
-
 string StealFoodAction::name() const { return "Steal Food"; }
 unique_ptr<CatAction> StealFoodAction::clone() const { return make_unique<StealFoodAction>(*this); }
 
 // :3 SpreadChaosAction
-
 SpreadChaosAction::SpreadChaosAction() = default;
-
 void SpreadChaosAction::execute(Cat& c, Humanity& h) {
     cout << c.getName() << " is spreading chaos!\n";
     c.trainEvil(5);
     h.increaseSuspicion(10);
 }
-
 string SpreadChaosAction::name() const { return "Spread Chaos"; }
 unique_ptr<CatAction> SpreadChaosAction::clone() const { return make_unique<SpreadChaosAction>(*this); }
 
 // :3 RecruitCatsAction
-
 RecruitCatsAction::RecruitCatsAction(CatOverlord* o) : overlord(o) {}
-
 void RecruitCatsAction::execute(Cat& c, Humanity& h) {
     (void)h;
     if (!overlord) return;
@@ -407,6 +309,15 @@ void RecruitCatsAction::execute(Cat& c, Humanity& h) {
     overlord->addCat(newCat);
     cout << c.getName() << " recruited a new cat: " << newCat.getName() << "\n";
 }
-
 string RecruitCatsAction::name() const { return "Recruit Cats"; }
 unique_ptr<CatAction> RecruitCatsAction::clone() const { return make_unique<RecruitCatsAction>(*this); }
+
+// :3 SendToSpaAction
+SendToSpaAction::SendToSpaAction() = default;
+void SendToSpaAction::execute(Cat& c, Humanity&) {
+    c.decreaseEvilness(5);
+    c.increaseCuteness(10);
+    cout << c.getName() << " went to spa! Evilness down, cuteness up.\n";
+}
+string SendToSpaAction::name() const { return "Send to Spa"; }
+unique_ptr<CatAction> SendToSpaAction::clone() const { return make_unique<SendToSpaAction>(*this); }

@@ -1,5 +1,6 @@
 #ifndef CLASE_H
 #define CLASE_H
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -9,6 +10,7 @@
 
 using namespace std;
 
+// :3
 class Cat {
 private:
     string name;
@@ -22,32 +24,40 @@ public:
     Cat(const Cat &other);
     ~Cat();
     Cat& operator=(const Cat& other);
+
     friend ostream& operator<<(ostream& os, const Cat& c);
+
     [[nodiscard]] const string& getName() const;
     [[nodiscard]] int getEvilness() const;
     [[nodiscard]] int getCuteness() const;
     [[nodiscard]] int getHunger() const;
     [[nodiscard]] int getLoyalty() const;
+
     void feed(int cant);
     void trainEvil(int cant);
     void rewardLoyalty(int cant);
     void increaseHunger(int cant);
     void decreaseEvilness(int amount);
-    void pamper(int amount);
+    void increaseCuteness(int amount);
 };
 
+// :3
 class Humanity {
 private:
     int suspicion;
     int maxSuspicion;
 public:
     explicit Humanity(int start = 0, int maxS = 100);
+
     void increaseSuspicion(int val);
     void decreaseSuspicion(int val);
+
     [[nodiscard]] bool isGameOver() const;
+
     friend ostream& operator<<(ostream& os, const Humanity& h);
 };
 
+// :3
 class Mission {
 public:
     enum MissionType { EVIL, PR };
@@ -63,17 +73,37 @@ private:
     MissionType type;
 public:
     Mission(const string& n, int diff, int money, int chaos, int hunger, int minE, int minL, int minC, MissionType t);
+
     [[nodiscard]] const string& getName() const { return name; }
     [[nodiscard]] int getRewardMoney() const { return rewardMoney; }
     [[nodiscard]] int getRewardChaos() const { return rewardChaos; }
     [[nodiscard]] int getHungerCost() const { return hungerCost; }
     [[nodiscard]] int getDifficulty() const { return difficulty; }
     [[nodiscard]] MissionType getType() const { return type; }
-    [[nodiscard]] bool attempt(const Cat& c) const;
+    [[nodiscard]]int getMinEvilness() const { return minEvilness; }
+    [[nodiscard]]int getMinLoyalty() const { return minLoyalty; }
+    [[nodiscard]]int getMinCuteness() const { return minCuteness; }
+
+    bool attempt(const Cat& c) const;
+
     friend ostream& operator<<(ostream& os, const Mission& m);
 };
 
-class CatAction;
+// :3
+class CatAction {
+public:
+    virtual ~CatAction() = default;
+    virtual void execute(Cat& c, Humanity& h) = 0;
+    virtual string name() const = 0;
+    virtual unique_ptr<CatAction> clone() const = 0;
+
+    void perform(Cat& c, Humanity& h) {
+        cout << c.getName() << " is performing action: " << name() << endl;
+        execute(c, h);
+    }
+};
+
+// :3
 class CatOverlord {
 private:
     vector<Cat> cats;
@@ -81,38 +111,37 @@ private:
     int chaosPoints;
     int actionPoints;
     vector<unique_ptr<CatAction>> actions;
+
 public:
     explicit CatOverlord(int startMoney = 50, int startChaos = 10, int startAP = 6);
+
     friend ostream& operator<<(ostream& os, const CatOverlord& o);
+
     void addCat(const Cat& c);
     void feedCat(int index, int cant);
     void encourageCat(int index, int cant);
-    void nextDay();
-    bool sendOnMission(int index, const Mission& m, Humanity& humans);
     void trainCatEvil(int index, int cant);
+    void sendOnMission(int index, const Mission& m, Humanity& humans);
+    void sendCatToSpa(int index, int cost);
+
     void printStatus() const;
     void printCats() const;
+
     void feedCatInteractive();
     void encourageCatInteractive();
     void trainCatEvilInteractive();
     void sendOnMissionInteractive(Humanity& humans);
     void calmCatInteractive();
+
+    void nextDay();
     void sortCatsByEvilness();
-    bool checkEvilnessGameOver();
-    vector<Cat>& getCats() { return cats; }
+
     void performAction(int catIndex, int actionIndex, Humanity& humans);
+
     size_t getNumActions() { return actions.size(); }
     vector<unique_ptr<CatAction>>& getActions() { return actions; }
-    void sendCatToSpaInteractive();
-};
 
-class CatAction {
-public:
-    virtual ~CatAction() = default;
-    virtual void execute(Cat& c, Humanity& h) = 0;
-    virtual string name() const = 0;
-    virtual unique_ptr<CatAction> clone() const = 0;
-    void perform(Cat& c, Humanity& h) { cout << c.getName() << " is performing action: " << name() << endl; execute(c, h); }
+    vector<Cat>& getCats() { return cats; }
 };
 
 class StealFoodAction : public CatAction {
@@ -141,6 +170,15 @@ public:
     unique_ptr<CatAction> clone() const override;
 };
 
+class SendToSpaAction : public CatAction {
+public:
+    SendToSpaAction();
+    void execute(Cat& c, Humanity& h) override;
+    string name() const override;
+    unique_ptr<CatAction> clone() const override;
+};
+
+// :3
 class GameException : public exception {
 protected:
     string message;
