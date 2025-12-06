@@ -190,10 +190,12 @@ void CatOverlord::trainCatEvilInteractive() {
 
 void CatOverlord::sendOnMissionInteractive(Humanity& h) {
     if (cats.empty()) return;
-    int index; cout << "Select cat for mission: "; cin >> index;
+    int index;
+    cout << "Select cat for mission: ";
+    cin >> index;
     if (index < 0 || index >= (int)cats.size()) throw InvalidCatIndexException(index);
 
-    // Example missions for demo
+    // Exemple misiuni
     vector<Mission> prMissions = {
         {"Make a brainrot TikTok", 1, 25, 0, 10, 0, 0, 15, Mission::PR},
         {"Make AI Facebook post", 2, 50, 0, 10, 0, 0, 25, Mission::PR}
@@ -203,50 +205,59 @@ void CatOverlord::sendOnMissionInteractive(Humanity& h) {
         {"Steal the laser from Magurele", 2, 0, 50, 10, 80, 0, 0, Mission::EVIL}
     };
 
-    int missionType; cout << "Select mission type (0=PR, 1=EVIL): "; cin >> missionType;
+    int missionType;
+    cout << "Select mission type (0=PR, 1=EVIL): ";
+    cin >> missionType;
     int missionIndex;
+
+    const Mission* selectedMission = nullptr;
+
     if (missionType == 0) {
-        for (size_t i = 0; i < prMissions.size(); ++i) cout << i << ": " << prMissions[i].getName() << endl;
-        cout << "Select mission index: "; cin >> missionIndex;
+        for (size_t i = 0; i < prMissions.size(); ++i)
+            cout << i << ": " << prMissions[i].getName() << endl;
+        cout << "Select mission index: ";
+        cin >> missionIndex;
         if (missionIndex < 0 || missionIndex >= (int)prMissions.size()) return;
+        selectedMission = &prMissions[missionIndex];
+    } else {
+        for (size_t i = 0; i < evilMissions.size(); ++i)
+            cout << i << ": " << evilMissions[i].getName() << endl;
+        cout << "Select mission index: ";
+        cin >> missionIndex;
+        if (missionIndex < 0 || missionIndex >= (int)evilMissions.size()) return;
+        selectedMission = &evilMissions[missionIndex];
+    }
 
-        Mission& m = prMissions[missionIndex];
-        Cat& c = cats[index];
+    if (!selectedMission) return;
 
-        if (c.getCuteness() >= m.getMinCuteness()) {
-            cout << "Success! ";
+    Cat& c = cats[index];
+
+    if (selectedMission->attempt(c)) {
+        cout << "Success! ";
+        if (selectedMission->getType() == Mission::PR) {
             if (missionIndex == 0) cout << "The kids loved this one. It's becoming the new Italian brainrot.\n";
             else cout << "The post reached old people's feeds!\n";
             h.decreaseSuspicion( missionIndex == 0 ? 25 : 35 );
-            money += m.getRewardMoney();
+            money += selectedMission->getRewardMoney();
         } else {
-            cout << "Fail! ";
+            if (missionIndex == 0) cout << "The sock collection is growing.\n";
+            else cout << "The cats will enjoy this laser.\n";
+            chaosPoints += selectedMission->getRewardChaos();
+        }
+    } else {
+        cout << "Fail! ";
+        if (selectedMission->getType() == Mission::PR) {
             if (missionIndex == 0) cout << "Phew, that video sucked. Never attempt editing again.\n";
             else cout << "Even the grandparents figured out it's AI and they are suing you now.\n";
             h.increaseSuspicion( missionIndex == 0 ? 22 : 44 );
-        }
-    } else {
-        for (size_t i = 0; i < evilMissions.size(); ++i) cout << i << ": " << evilMissions[i].getName() << endl;
-        cout << "Select mission index: "; cin >> missionIndex;
-        if (missionIndex < 0 || missionIndex >= (int)evilMissions.size()) return;
-
-        Mission& m = evilMissions[missionIndex];
-        Cat& c = cats[index];
-
-        if (c.getEvilness() >= m.getMinEvilness()) {
-            cout << "Success! ";
-            if (missionIndex == 0) cout << "The sock collection is growing.\n";
-            else cout << "The cats will enjoy this laser.\n";
-            chaosPoints += m.getRewardChaos();
         } else {
-            cout << "Fail! ";
             if (missionIndex == 0) cout << "You have disappointed the sock lovers in the cat society.\n";
             else cout << "Cojocariu will remember this.\n";
             h.increaseSuspicion( missionIndex == 0 ? 33 : 67 );
         }
     }
 
-    cats[index].increaseHunger(10);
+    c.increaseHunger(selectedMission->getHungerCost());
     actionPoints--;
 }
 

@@ -84,7 +84,7 @@ public:
     [[nodiscard]]int getMinLoyalty() const { return minLoyalty; }
     [[nodiscard]]int getMinCuteness() const { return minCuteness; }
 
-    bool attempt(const Cat& c) const;
+    [[nodiscard]]bool attempt(const Cat& c) const;
 
     friend ostream& operator<<(ostream& os, const Mission& m);
 };
@@ -94,8 +94,8 @@ class CatAction {
 public:
     virtual ~CatAction() = default;
     virtual void execute(Cat& c, Humanity& h) = 0;
-    virtual string name() const = 0;
-    virtual unique_ptr<CatAction> clone() const = 0;
+    [[nodiscard]]virtual string name() const = 0;
+    [[nodiscard]]virtual unique_ptr<CatAction> clone() const = 0;
 
     void perform(Cat& c, Humanity& h) {
         cout << c.getName() << " is performing action: " << name() << endl;
@@ -121,7 +121,6 @@ public:
     void feedCat(int index, int cant);
     void encourageCat(int index, int cant);
     void trainCatEvil(int index, int cant);
-    void sendOnMission(int index, const Mission& m, Humanity& humans);
     void sendCatToSpa(int index, int cost);
 
     void printStatus() const;
@@ -140,24 +139,22 @@ public:
 
     size_t getNumActions() { return actions.size(); }
     vector<unique_ptr<CatAction>>& getActions() { return actions; }
-
-    vector<Cat>& getCats() { return cats; }
 };
 
 class StealFoodAction : public CatAction {
 public:
     StealFoodAction();
     void execute(Cat& c, Humanity& h) override;
-    string name() const override;
-    unique_ptr<CatAction> clone() const override;
+    [[nodiscard]]string name() const override;
+    [[nodiscard]]unique_ptr<CatAction> clone() const override;
 };
 
 class SpreadChaosAction : public CatAction {
 public:
     SpreadChaosAction();
     void execute(Cat& c, Humanity& h) override;
-    string name() const override;
-    unique_ptr<CatAction> clone() const override;
+    [[nodiscard]]string name() const override;
+    [[nodiscard]]unique_ptr<CatAction> clone() const override;
 };
 
 class RecruitCatsAction : public CatAction {
@@ -166,16 +163,16 @@ private:
 public:
     explicit RecruitCatsAction(CatOverlord* o);
     void execute(Cat& c, Humanity& h) override;
-    string name() const override;
-    unique_ptr<CatAction> clone() const override;
+    [[nodiscard]]string name() const override;
+    [[nodiscard]]unique_ptr<CatAction> clone() const override;
 };
 
 class SendToSpaAction : public CatAction {
 public:
     SendToSpaAction();
     void execute(Cat& c, Humanity& h) override;
-    string name() const override;
-    unique_ptr<CatAction> clone() const override;
+    [[nodiscard]]string name() const override;
+    [[nodiscard]]unique_ptr<CatAction> clone() const override;
 };
 
 // :3
@@ -184,7 +181,7 @@ protected:
     string message;
 public:
     explicit GameException(string msg) : message(std::move(msg)) {}
-    const char* what() const noexcept override { return message.c_str(); }
+    [[nodiscard]]const char* what() const noexcept override { return message.c_str(); }
 };
 
 class InvalidCatIndexException : public GameException {

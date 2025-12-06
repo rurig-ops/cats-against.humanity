@@ -10,6 +10,7 @@ int main() {
     overlord.addCat(Cat("Sebi"));
     overlord.addCat(Cat("Dracat"));
     overlord.addCat(Cat("Lucius"));
+    overlord.sortCatsByEvilness();
 
     bool quit = false;
     while (!quit && !humans.isGameOver()) {
@@ -34,8 +35,12 @@ int main() {
             switch(choice) {
                 case 1: overlord.feedCatInteractive(); break;
                 case 2: overlord.encourageCatInteractive(); break;
-                case 3: overlord.trainCatEvilInteractive(); break;
-                case 4: overlord.sendOnMissionInteractive(humans); break;
+                case 3: overlord.trainCatEvilInteractive();
+                        overlord.sortCatsByEvilness();
+                        break;
+                case 4: overlord.sendOnMissionInteractive(humans);
+                        overlord.sortCatsByEvilness();
+                        break;
                 case 5: {
                     overlord.printCats();
                     cout << "Select cat index: "; int ci; cin >> ci;
