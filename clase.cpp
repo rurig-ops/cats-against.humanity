@@ -287,7 +287,15 @@ void CatOverlord::sortCatsByEvilness() {
 void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
     if (catIndex < 0 || catIndex >= (int)cats.size()) throw InvalidCatIndexException(catIndex);
     if (actionIndex < 0 || actionIndex >= (int)actions.size()) return;
-    actions[actionIndex]->perform(cats[catIndex], h);
+
+    CatAction* a = actions[actionIndex].get();
+
+    // DOWNCAST demonstrativ
+    if (auto recruit = dynamic_cast<RecruitCatsAction*>(a)) {
+        cout << "Detected RecruitCatsAction! This action can recruit new cats.\n";
+    }
+
+    a->perform(cats[catIndex], h);
 }
 
 // :3 StealFoodAction
