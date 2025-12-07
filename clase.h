@@ -175,6 +175,14 @@ public:
     [[nodiscard]]unique_ptr<CatAction> clone() const override;
 };
 
+class PerformDanceRitualAction : public CatAction {
+public:
+    PerformDanceRitualAction() = default;
+    void execute(Cat& c, Humanity& h) override;
+    [[nodiscard]] string name() const override;
+    [[nodiscard]] unique_ptr<CatAction> clone() const override;
+};
+
 // :3
 class GameException : public exception {
 protected:

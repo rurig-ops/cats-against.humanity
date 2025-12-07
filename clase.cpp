@@ -4,7 +4,7 @@
 
 using namespace std;
 
-// :3 Cat
+// :3
 int Cat::totalCats = 0;
 Cat::Cat(string n, int e, int c, int h, int l)
     : name(n), evilness(e), cuteness(c), hunger(h), loyalty(l) {
@@ -134,23 +134,23 @@ CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     actions.push_back(make_unique<SpreadChaosAction>());
     actions.push_back(make_unique<RecruitCatsAction>(this));
     actions.push_back(make_unique<SendToSpaAction>());
+    actions.push_back(make_unique<PerformDanceRitualAction>());
 }
 
-// COPY CONSTRUCTOR
+// copy construct
 CatOverlord::CatOverlord(const CatOverlord& other)
     : cats(other.cats),
       money(other.money),
       chaosPoints(other.chaosPoints),
       actionPoints(other.actionPoints)
 {
-    // clonăm acțiunile
     actions.clear();
     for (const auto& a : other.actions) {
         actions.push_back(a->clone());
     }
 }
 
-// OPERATOR= CU COPY-AND-SWAP
+// copy/swap
 CatOverlord& CatOverlord::operator=(CatOverlord other) {
     swap(cats, other.cats);
     swap(actions, other.actions);
@@ -205,7 +205,6 @@ void CatOverlord::sendCatToSpa(int i, int cost) {
     actionPoints--;
 }
 
-// interactive
 void CatOverlord::feedCatInteractive() {
     int index, cant;
     cout << "Which cat to feed? "; cin >> index;
@@ -329,7 +328,7 @@ void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
 
     CatAction* a = actions[actionIndex].get();
 
-    // DOWNCAST demonstrativ
+    // dynamic downcast
     if (auto recruit = dynamic_cast<RecruitCatsAction*>(a)) {
         (void)recruit;
         cout << "Detected RecruitCatsAction! This action can recruit new cats.\n";
@@ -380,3 +379,18 @@ void SendToSpaAction::execute(Cat& c, Humanity&) {
 }
 string SendToSpaAction::name() const { return "Send to Spa"; }
 unique_ptr<CatAction> SendToSpaAction::clone() const { return make_unique<SendToSpaAction>(*this); }
+
+void PerformDanceRitualAction::execute(Cat& c, Humanity& h) {
+    cout << c.getName() << " is performing a crazy dance ritual! :D" << endl;
+    c.increaseCuteness(10);
+    c.trainEvil(10);
+    c.feed(20);
+    h.increaseSuspicion(25);
+}
+string PerformDanceRitualAction::name() const {
+    return "Perform Dance Ritual";
+}
+
+unique_ptr<CatAction> PerformDanceRitualAction::clone() const {
+    return make_unique<PerformDanceRitualAction>(*this);
+}
