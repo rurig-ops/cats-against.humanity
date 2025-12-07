@@ -15,11 +15,11 @@ int main() {
     }
 
     string name;
-    int e, c, h, l;
+    int ev, c, h, l;
 
     while (fin >> name) {
-        if (fin >> e >> c >> h >> l) {
-            overlord.addCat(Cat(name, e, c, h, l));
+        if (fin >> ev >> c >> h >> l) {
+            overlord.addCat(Cat(name, ev, c, h, l));
         } else {
             fin.clear();
             overlord.addCat(Cat(name));
