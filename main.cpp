@@ -1,5 +1,6 @@
 #include "clase.h"
 #include <iostream>
+#include<fstream>
 using namespace std;
 
 int main() {
@@ -7,9 +8,24 @@ int main() {
     CatOverlord overlord(100, 0, 6);
     Humanity humans(0, 100);
 
-    overlord.addCat(Cat("Sebi"));
-    overlord.addCat(Cat("Dracat"));
-    overlord.addCat(Cat("Lucius"));
+    ifstream fin("cats.txt");
+    if (!fin) {
+        cerr << "Can't open cats.txt!\n";
+        return 1;
+    }
+
+    string name;
+    int e, c, h, l;
+
+    while (fin >> name) {
+        if (fin >> e >> c >> h >> l) {
+            overlord.addCat(Cat(name, e, c, h, l));
+        } else {
+            fin.clear();
+            overlord.addCat(Cat(name));
+        }
+    }
+
     overlord.sortCatsByEvilness();
 
     bool quit = false;
@@ -18,7 +34,7 @@ int main() {
         overlord.printStatus();
         overlord.printCats();
         cout << humans << endl;
-        cout << "==================" << endl;
+        cout << "Total cats: " << Cat::getTotalCats() << endl;
 
         cout << "\nChoose an action:" << endl;
         cout << "1. Feed a cat" << endl;

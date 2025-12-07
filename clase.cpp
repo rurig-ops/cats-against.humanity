@@ -5,10 +5,25 @@
 using namespace std;
 
 // :3 Cat
-Cat::Cat(string n, int e, int c, int h, int l) : name(n), evilness(e), cuteness(c), hunger(h), loyalty(l) {}
-Cat::Cat(string n) : name(n), evilness(25), cuteness(25), hunger(50), loyalty(10) {}
-Cat::Cat(const Cat &other) : name(other.name), evilness(other.evilness), cuteness(other.cuteness), hunger(other.hunger), loyalty(other.loyalty) {}
-Cat::~Cat() {}
+int Cat::totalCats = 0;
+Cat::Cat(string n, int e, int c, int h, int l)
+    : name(n), evilness(e), cuteness(c), hunger(h), loyalty(l) {
+    ++totalCats;
+}
+
+Cat::Cat(string n)
+    : name(n), evilness(25), cuteness(25), hunger(50), loyalty(10) {
+    ++totalCats;
+}
+
+Cat::Cat(const Cat &other)
+    : name(other.name), evilness(other.evilness), cuteness(other.cuteness), hunger(other.hunger), loyalty(other.loyalty) {
+    ++totalCats;
+}
+
+Cat::~Cat() {
+    --totalCats;
+}
 Cat& Cat::operator=(const Cat& other) {
     if (this != &other) {
         name = other.name;

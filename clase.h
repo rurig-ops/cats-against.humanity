@@ -18,6 +18,7 @@ private:
     int cuteness;
     int hunger;
     int loyalty;
+    static int totalCats;
 public:
     Cat(string n, int e, int c, int h, int l);
     explicit Cat(string n);
@@ -32,6 +33,7 @@ public:
     [[nodiscard]] int getCuteness() const;
     [[nodiscard]] int getHunger() const;
     [[nodiscard]] int getLoyalty() const;
+    [[nodiscard]]static int getTotalCats() { return totalCats; }
 
     void feed(int cant);
     void trainEvil(int cant);
