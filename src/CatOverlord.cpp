@@ -95,8 +95,9 @@ void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
     if (actionIndex < 0 || actionIndex >= (int)actions.size()) return;
 
     // Utilitatea dynamic_cast cerută de feedback
-    if (auto recruit = dynamic_cast<RecruitCatsAction*>(actions[actionIndex].get())) {
-        cout << "[SYSTEM] Strategic recruitment bonus active!" << endl;
+    if (auto* recruit = dynamic_cast<RecruitCatsAction*>(actions[actionIndex].get())) {
+        std::cout << "[Special Action] Recruiting logic detected for: " << cats[catIndex].getName() << std::endl;
+        (void)recruit;
     }
 
     actions[actionIndex]->perform(cats[catIndex], h);
