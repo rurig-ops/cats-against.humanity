@@ -9,7 +9,7 @@
 using namespace std;
 
 int main() {
-    cout << "Welcome to Cat Overlord Game! :3" << endl;
+    cout << "Welcome to Cat Overlord Game! :3\n";
 
     // Inițializare joc
     CatOverlord overlord(100, 0, 6);
