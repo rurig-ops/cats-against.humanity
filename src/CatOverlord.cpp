@@ -7,7 +7,6 @@
 
 using namespace std;
 
-/** Initializarea membrului static pentru Singleton obligatorie in .cpp */
 GameSettings* GameSettings::instance = nullptr;
 
 CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
@@ -19,20 +18,21 @@ CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     actions.push_back(make_unique<PerformDanceRitualAction>());
 }
 
-/** * Constructor de copiere - FOLOSESTE lista de initializare pentru a evita stack-overflow.
- * Utilizeaza Prototype Pattern prin clone().
- */
+// FIX: Constructor de copiere care actualizeaza pointerii interni
 CatOverlord::CatOverlord(const CatOverlord& other)
     : cats(other.cats), money(other.money),
       chaosPoints(other.chaosPoints), actionPoints(other.actionPoints) {
     for (const auto& a : other.actions) {
-        actions.push_back(a->clone());
+        auto clona = a->clone();
+        // Daca actiunea este de recrutare, trebuie sa pointeze catre NOUL overlord (this)
+        auto recruitPtr = dynamic_cast<RecruitCatsAction*>(clona.get());
+        if (recruitPtr) {
+            recruitPtr->setOverlord(this);
+        }
+        actions.push_back(std::move(clona));
     }
 }
 
-/** * Operator= (Copy-and-Swap).
- * Parametrul 'other' primit prin valoare apeleaza constructorul de copiere de mai sus.
- */
 CatOverlord& CatOverlord::operator=(CatOverlord other) {
     swap(cats, other.cats);
     swap(actions, other.actions);
@@ -83,7 +83,6 @@ void CatOverlord::sendCatToSpa(int i, int cost) {
     cats[i].increaseCuteness(15);
     money -= cost;
     actionPoints--;
-    cout << cats[i].getName() << " feels refreshed!" << endl;
 }
 
 void CatOverlord::sortCatsByEvilness() {
@@ -94,7 +93,6 @@ void CatOverlord::sortCatsByEvilness() {
 
 void CatOverlord::printStatus() const {
     cout << "Money: " << money << " | Chaos: " << chaosPoints << " | AP: " << actionPoints << endl;
-    /** Utilizare Singleton pentru a bifa cerinta si a asigura apelul functiei */
     cout << "Game Difficulty: " << GameSettings::getInstance().getDifficulty() << endl;
 }
 
@@ -102,15 +100,9 @@ void CatOverlord::printCats() const {
     for (size_t i = 0; i < cats.size(); ++i) cout << i << ": " << cats[i] << endl;
 }
 
-/** Executie polimorfica - Repara warning-ul de 'unused variable' detectat de GitHub */
 void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
     if (catIndex < 0 || catIndex >= (int)cats.size()) throw InvalidCatIndexException(catIndex);
     if (actionIndex < 0 || actionIndex >= (int)actions.size()) return;
-
-    // Verificare tip fara a declara o variabila nefolosita
-    if (dynamic_cast<RecruitCatsAction*>(actions[actionIndex].get())) {
-        std::cout << "[Strategy] Specialized recruitment logic detected." << std::endl;
-    }
 
     actions[actionIndex]->perform(cats[catIndex], h);
 }
@@ -121,38 +113,34 @@ void CatOverlord::nextDay() {
     cout << "--- A new day for the conspiracy begins ---" << endl;
 }
 
-// Metode Interactive
 void CatOverlord::feedCatInteractive() {
     int idx, amt;
-    cout << "Cat index: "; cin >> idx;
-    cout << "Food amount ($): "; cin >> amt;
+    if (!(cin >> idx >> amt)) return;
     feedCat(idx, amt);
 }
 
 void CatOverlord::encourageCatInteractive() {
     int idx, amt;
-    cout << "Cat index: "; cin >> idx;
-    cout << "Loyalty points: "; cin >> amt;
+    if (!(cin >> idx >> amt)) return;
     encourageCat(idx, amt);
 }
 
 void CatOverlord::trainCatEvilInteractive() {
     int idx, amt;
-    cout << "Cat index: "; cin >> idx;
-    cout << "Training cost ($): "; cin >> amt;
+    if (!(cin >> idx >> amt)) return;
     trainCatEvil(idx, amt);
 }
 
 void CatOverlord::calmCatInteractive() {
     int idx;
-    cout << "Cat to send to spa index: "; cin >> idx;
+    if (!(cin >> idx)) return;
     sendCatToSpa(idx, 15);
 }
 
 void CatOverlord::sendOnMissionInteractive(Humanity& h) {
     if (cats.empty()) return;
     int index;
-    cout << "Select cat for mission: "; cin >> index;
+    if (!(cin >> index)) return;
     if (index < 0 || index >= (int)cats.size()) throw InvalidCatIndexException(index);
 
     vector<Mission> missions = {
@@ -161,16 +149,15 @@ void CatOverlord::sendOnMissionInteractive(Humanity& h) {
     };
 
     for(size_t i=0; i<missions.size(); ++i) cout << i << ". " << missions[i].getName() << endl;
-    int mIdx; cout << "Mission index: "; cin >> mIdx;
+    int mIdx;
+    if (!(cin >> mIdx)) return;
 
     if (mIdx >= 0 && mIdx < (int)missions.size()) {
         if (missions[mIdx].attempt(cats[index])) {
-            cout << "Mission Success!" << endl;
             money += missions[mIdx].getRewardMoney();
             chaosPoints += missions[mIdx].getRewardChaos();
             h.decreaseSuspicion(5);
         } else {
-            cout << "Mission Failed! Humans are suspicious." << endl;
             h.increaseSuspicion(15);
         }
         cats[index].increaseHunger(missions[mIdx].getHungerCost());
@@ -179,6 +166,6 @@ void CatOverlord::sendOnMissionInteractive(Humanity& h) {
 }
 
 ostream& operator<<(ostream& os, const CatOverlord& o) {
-    os << "Overlord with " << o.cats.size() << " cats.";
+    os << "Overlord with " << (int)o.cats.size() << " cats.";
     return os;
 }
