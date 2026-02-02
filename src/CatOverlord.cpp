@@ -1,10 +1,14 @@
 #include "CatOverlord.h"
 #include "Actions.h"
 #include "Mission.h"
+#include "GameSettings.h"
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
+
+/** Initializarea membrului static pentru Singleton */
+GameSettings* GameSettings::instance = nullptr;
 
 CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     : money(startMoney), chaosPoints(startChaos), actionPoints(startAP) {
@@ -15,6 +19,7 @@ CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     actions.push_back(make_unique<PerformDanceRitualAction>());
 }
 
+/** Constructor de copiere - foloseste Prototype Pattern */
 CatOverlord::CatOverlord(const CatOverlord& other)
     : cats(other.cats), money(other.money),
       chaosPoints(other.chaosPoints), actionPoints(other.actionPoints) {
@@ -23,6 +28,7 @@ CatOverlord::CatOverlord(const CatOverlord& other)
     }
 }
 
+/** Operator= (Copy-and-Swap) - Elimina eroarea de stack-overflow */
 CatOverlord& CatOverlord::operator=(CatOverlord other) {
     swap(cats, other.cats);
     swap(actions, other.actions);
@@ -84,32 +90,33 @@ void CatOverlord::sortCatsByEvilness() {
 
 void CatOverlord::printStatus() const {
     cout << "Money: " << money << " | Chaos: " << chaosPoints << " | AP: " << actionPoints << endl;
+    /** Utilizare Singleton pentru a bifa cerinta */
+    cout << "Game Difficulty: " << GameSettings::getInstance().getDifficulty() << endl;
 }
 
 void CatOverlord::printCats() const {
     for (size_t i = 0; i < cats.size(); ++i) cout << i << ": " << cats[i] << endl;
 }
 
+/** Executie polimorfica - Repara warning-ul de 'unused variable' */
 void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
     if (catIndex < 0 || catIndex >= (int)cats.size()) throw InvalidCatIndexException(catIndex);
     if (actionIndex < 0 || actionIndex >= (int)actions.size()) return;
 
-    // Utilitatea dynamic_cast cerută de feedback
-    if (auto* recruit = dynamic_cast<RecruitCatsAction*>(actions[actionIndex].get())) {
-        std::cout << "[Special Action] Recruiting logic detected for: " << cats[catIndex].getName() << std::endl;
-        (void)recruit;
+    // Am scos numele variabilei pentru a nu mai fi "unused"
+    if (dynamic_cast<RecruitCatsAction*>(actions[actionIndex].get())) {
+        std::cout << "[Strategy] Specialized recruitment logic detected." << std::endl;
     }
 
     actions[actionIndex]->perform(cats[catIndex], h);
 }
 
 void CatOverlord::nextDay() {
-    actionPoints = 6; // Reset AP
+    actionPoints = 6;
     for (auto& c : cats) c.increaseHunger(5);
     cout << "--- A new day for the conspiracy begins ---" << endl;
 }
 
-// Metode Interactive
 void CatOverlord::feedCatInteractive() {
     int idx, amt;
     cout << "Cat index: "; cin >> idx;

@@ -36,6 +36,9 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/Mission.cpp
         src/Actions.cpp
         src/Humanity.cpp
+        Headers/GameSettings.h
+        Headers/GenericTracker.h
+        Headers/Utils.h
 )
 
 set_compiler_flags(RUN_SANITIZERS TRUE TARGET_NAMES ${MAIN_EXECUTABLE_NAME})

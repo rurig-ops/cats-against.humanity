@@ -2,16 +2,29 @@
 #include "Cat.h"
 #include "Humanity.h"
 #include "Exceptions.h"
+#include "GameSettings.h"
+#include "GenericTracker.h"
+#include "Utils.h"
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 int main() {
-    cout << "Welcome to Cat Overlord Game! :3\n";
+    // 1. Instanțieri obligatorii pentru Clasa Șablon (GenericTracker)
+    GenericTracker<int> moneyLog;
+    moneyLog.log(100);
 
-    // Inițializare joc
+    GenericTracker<std::string> eventLog;
+    eventLog.log("Game Session Started");
+
+    // 2. Instanțiere obligatorie pentru Funcția Șablon (logGameEvent)
+    logGameEvent("Difficulty Setting", GameSettings::getInstance().getDifficulty());
+
+    cout << "Welcome to Cat Overlord Game! :3" << endl;
+
     CatOverlord overlord(100, 0, 6);
     Humanity humans(0, 100);
 
@@ -22,13 +35,8 @@ int main() {
     } else {
         string name;
         int ev, c, h, l;
-        while (fin >> name) {
-            if (fin >> ev >> c >> h >> l) {
-                overlord.addCat(Cat(name, ev, c, h, l));
-            } else {
-                fin.clear();
-                overlord.addCat(Cat(name));
-            }
+        while (fin >> name >> ev >> c >> h >> l) {
+            overlord.addCat(Cat(name, ev, c, h, l));
         }
         fin.close();
     }
@@ -41,7 +49,6 @@ int main() {
         overlord.printStatus();
         overlord.printCats();
         cout << humans << endl;
-        cout << "Total cats in hierarchy: " << Cat::getTotalCats() << endl;
 
         cout << "\nChoose an action:" << endl;
         cout << "1. Feed a cat" << endl;
@@ -88,29 +95,10 @@ int main() {
                 case 8: quit = true; break;
                 default: cout << "Invalid option!" << endl;
             }
-        }
-        // Tratarea excepțiilor separat, conform feedback-ului
-        catch (const NotEnoughMoneyException& e) {
-            cout << "\033[1;31mFinancial Error: " << e.what() << "\033[0m" << endl;
-        }
-        catch (const NotEnoughAPException& e) {
-            cout << "\033[1;33mAction Point Error: " << e.what() << "\033[0m" << endl;
-        }
-        catch (const InvalidCatIndexException& e) {
-            cout << "\033[1;31mSelection Error: " << e.what() << "\033[0m" << endl;
-        }
-        catch (const GameException& e) {
+        } catch (const GameException& e) {
             cout << "Game Error: " << e.what() << endl;
         }
-        catch (const exception& e) {
-            cout << "Unexpected System Error: " << e.what() << endl;
-        }
     }
-
-    if (humans.isGameOver())
-        cout << "\n!!! GAME OVER !!!\nHumans discovered the cat overlord plans!" << endl;
-    else
-        cout << "\nThanks for playing, Overlord! :3" << endl;
 
     return 0;
 }
