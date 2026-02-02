@@ -35,7 +35,7 @@ int main() {
     Humanity humans(0, 100);
 
     // Citire pisici din fișier
-    ifstream fin("citit.txt");
+    ifstream fin("cats.txt");
     if (!fin) {
         cerr << "Warning: Can't open cats.txt! Starting with an empty roster.\n";
     } else {
