@@ -13,7 +13,8 @@ public:
     enum MissionType { EVIL, PR };
 private:
     std::string name;
-    int difficulty, rewardMoney, rewardChaos, hungerCost;
+    [[maybe_unused]] int difficulty;
+    int  rewardMoney, rewardChaos, hungerCost;
     int minEvilness, minLoyalty, minCuteness;
     MissionType type;
 
@@ -24,7 +25,7 @@ public:
     [[nodiscard]] int getRewardMoney() const { return rewardMoney; }
     [[nodiscard]] int getRewardChaos() const { return rewardChaos; }
     [[nodiscard]] int getHungerCost() const { return hungerCost; }
-    [[nodiscard]] MissionType getType() const { return type; }
+    [[maybe_unused]] [[nodiscard]] MissionType getType() const { return type; }
 
     /** @brief Checks if a cat's stats meet the mission requirements. */
     [[nodiscard]] bool attempt(const Cat& c) const;

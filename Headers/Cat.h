@@ -29,7 +29,7 @@ public:
     [[nodiscard]] const std::string& getName() const { return name; }
     [[nodiscard]] int getEvilness() const { return evilness; }
     [[nodiscard]] int getCuteness() const { return cuteness; }
-    [[nodiscard]] int getHunger() const { return hunger; }
+    [[maybe_unused]] [[nodiscard]] int getHunger() const { return hunger; }
     [[nodiscard]] int getLoyalty() const { return loyalty; }
     static int getTotalCats() { return totalCats; }
 
