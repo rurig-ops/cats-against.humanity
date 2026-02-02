@@ -13,23 +13,29 @@
 using namespace std;
 
 int main() {
-    // 1. Instanțieri obligatorii pentru Clasa Șablon (GenericTracker)
+    // 1. Instantieri si utilizare clasa sablon (GenericTracker)
     GenericTracker<int> moneyLog;
     moneyLog.log(100);
 
     GenericTracker<std::string> eventLog;
     eventLog.log("Game Session Started");
 
-    // 2. Instanțiere obligatorie pentru Funcția Șablon (logGameEvent)
-    logGameEvent("Difficulty Setting", GameSettings::getInstance().getDifficulty());
+    // 2. Utilizare Singleton pentru setare dificultate
+    cout << "Alege dificultatea jocului (1-3): ";
+    int diff;
+    if (!(cin >> diff)) diff = 1;
+    GameSettings::getInstance().setDifficulty(diff);
 
-    cout << "Welcome to Cat Overlord Game! :3" << endl;
+    // 3. Utilizare functie sablon (logGameEvent)
+    logGameEvent("Difficulty Level Set To", GameSettings::getInstance().getDifficulty());
+
+    cout << "\nWelcome to Cat Overlord Game! :3" << endl;
 
     CatOverlord overlord(100, 0, 6);
     Humanity humans(0, 100);
 
     // Citire pisici din fișier
-    ifstream fin("cats.txt");
+    ifstream fin("citit.txt");
     if (!fin) {
         cerr << "Warning: Can't open cats.txt! Starting with an empty roster.\n";
     } else {
@@ -91,7 +97,10 @@ int main() {
                     break;
                 }
                 case 6: overlord.calmCatInteractive(); break;
-                case 7: overlord.nextDay(); break;
+                case 7:
+                    overlord.nextDay();
+                    eventLog.log("Day ended");
+                    break;
                 case 8: quit = true; break;
                 default: cout << "Invalid option!" << endl;
             }
@@ -99,6 +108,9 @@ int main() {
             cout << "Game Error: " << e.what() << endl;
         }
     }
+
+    cout << "\n--- Final Statistics ---" << endl;
+    logGameEvent("Total Events Logged", eventLog.getTotalEntries());
 
     return 0;
 }
