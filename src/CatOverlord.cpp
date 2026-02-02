@@ -29,7 +29,6 @@ CatOverlord::CatOverlord(const CatOverlord& other)
     for (const auto& a : other.actions) {
         auto clona = a->clone();
 
-        // Fix pentru RecruitCatsAction: trebuie sa puncteze la noul Overlord, nu la cel vechi
         auto recruitPtr = dynamic_cast<RecruitCatsAction*>(clona.get());
         if (recruitPtr) {
             recruitPtr->setOverlord(this);

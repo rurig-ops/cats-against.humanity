@@ -35,6 +35,10 @@ void Cat::decreaseEvilness(int amount) { evilness = std::max(0, evilness - amoun
 void Cat::increaseCuteness(int amount) { cuteness = std::min(100, cuteness + amount); }
 
 std::ostream& operator<<(std::ostream& os, const Cat& c) {
-    os << c.name << " [Evil: " << c.evilness << " Luck: " << c.loyalty << "]";
+    os << "[" << c.name << "] "
+       << "evil: " << c.evilness << " | "
+       << "cute: " << c.cuteness << " | "
+       << "hunger: " << c.hunger << " | "
+       << "loyalty: " << c.loyalty;
     return os;
 }

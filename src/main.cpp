@@ -44,6 +44,7 @@ int main() {
         fin.close();
     } else {
         cout << "eroare: nu am gasit fisierul cats.txt!" << endl;
+        overlord.addCat(Cat("operative_zero", 10, 10, 5, 5));
     }
 
     // sortare initiala
