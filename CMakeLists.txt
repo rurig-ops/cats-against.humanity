@@ -13,12 +13,11 @@ include(cmake/Options.cmake)
 include(cmake/CompilerFlags.cmake)
 include(cmake/CopyHelper.cmake)
 
-# Spunem compilatorului să caute headerele în folderul Headers
 include_directories(Headers)
 
-# Adăugăm fișierele sursă și headerele (FĂRĂ DUPLICATE)
+
 add_executable(${MAIN_EXECUTABLE_NAME}
-        # Surse (.cpp)
+        # Surse
         src/main.cpp
         src/Cat.cpp
         src/CatOverlord.cpp
@@ -26,7 +25,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/Humanity.cpp
         src/Mission.cpp
 
-        # Headere (.h) - Importante pentru vizibilitate și CI
+        # Headere
         Headers/Cat.h
         Headers/CatOverlord.h
         Headers/Actions.h
