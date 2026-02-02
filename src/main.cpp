@@ -14,15 +14,14 @@
 using namespace std;
 
 int main() {
-    // trackere loguri
     GenericTracker<int> moneyLog;
     GenericTracker<string> eventLog;
     eventLog.log("game session started");
 
-    // setare dificultate
     cout << "alege dificultatea (1-3): ";
     int diff = 1;
     if (!(cin >> diff)) {
+        if (cin.eof()) return 0;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
@@ -33,7 +32,6 @@ int main() {
     CatOverlord overlord(100, 0, 6);
     Humanity humans(0, 100);
 
-    // citire date pisici
     ifstream fin("cats.txt");
     if (fin) {
         string name;
@@ -47,7 +45,6 @@ int main() {
         overlord.addCat(Cat("operative_zero", 10, 10, 5, 5));
     }
 
-    // sortare initiala
     overlord.sortCatsByEvilness();
 
     bool quit = false;
@@ -79,13 +76,19 @@ int main() {
                 case 5: {
                     int ci = -1, ai = -1;
                     cout << "cat index: ";
-                    if (!(cin >> ci)) { cin.clear(); cin.ignore(1000, '\n'); break; }
+                    if (!(cin >> ci)) {
+                        if (cin.eof()) { quit = true; break; }
+                        cin.clear(); cin.ignore(1000, '\n'); break;
+                    }
 
                     cout << "action index:" << endl;
                     for (size_t i = 0; i < overlord.getNumActions(); i++)
                         cout << i << ". " << overlord.getActions()[i]->name() << "\n";
 
-                    if (!(cin >> ai)) { cin.clear(); cin.ignore(1000, '\n'); break; }
+                    if (!(cin >> ai)) {
+                        if (cin.eof()) { quit = true; break; }
+                        cin.clear(); cin.ignore(1000, '\n'); break;
+                    }
                     overlord.performAction(ci, ai, humans);
                     break;
                 }
@@ -100,9 +103,11 @@ int main() {
         } catch (const GameException& e) {
             cout << "error: " << e.what() << endl;
         }
+
+        // Verificare finala dupa fiecare runda pentru a preveni bucla MSan
+        if (cin.fail() && cin.eof()) break;
     }
 
-    // statistici finale
     cout << "\n--- final statistics ---" << endl;
     overlord.printStatus();
     logGameEvent("total events logged", eventLog.getTotalEntries());
