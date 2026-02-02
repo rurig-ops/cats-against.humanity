@@ -9,7 +9,7 @@ private:
     std::vector<T> history;
 
 public:
-    void log(T value) {
+    void log(const T& value) {
         history.push_back(value);
     }
 
