@@ -135,14 +135,18 @@ void CatOverlord::feedCatInteractive() {
 
 void CatOverlord::encourageCatInteractive() {
     int idx = -1, amt = 0;
-    cout << "Cat index: ";
+
+    cout << "cat index: ";
     if (!(cin >> idx)) {
+        if (cin.eof()) return;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return;
     }
-    cout << "Loyalty points: ";
+
+    cout << "loyalty points: ";
     if (!(cin >> amt)) {
+        if (cin.eof()) return;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return;
@@ -151,7 +155,7 @@ void CatOverlord::encourageCatInteractive() {
     try {
         encourageCat(idx, amt);
     } catch (const GameException& e) {
-        cout << "Error: " << e.what() << endl;
+        cout << "error: " << e.what() << endl;
     }
 }
 
