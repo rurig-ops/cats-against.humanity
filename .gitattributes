@@ -1,1 +1,4 @@
 ext/** linguist-vendored
+scripts/* linguist-vendored
+tastatura.txt linguist-documentation
+cats.txt linguist-documentation
