@@ -4,7 +4,7 @@
 #include "GameSettings.h"
 #include <iostream>
 #include <algorithm>
-
+#include <limits>
 using namespace std;
 
 // Initializare statica obligatorie pentru Singleton
@@ -123,7 +123,7 @@ void CatOverlord::nextDay() {
     cout << "--- A new day has dawned for the feline empire ---" << endl;
 }
 
-// METODE INTERACTIVE - Repara Cppcheck prin initializarea variabilelor
+// METODE INTERACTIVE
 void CatOverlord::feedCatInteractive() {
     int idx = -1, amt = 0;
     cout << "Cat index: ";
@@ -136,10 +136,23 @@ void CatOverlord::feedCatInteractive() {
 void CatOverlord::encourageCatInteractive() {
     int idx = -1, amt = 0;
     cout << "Cat index: ";
-    if (!(cin >> idx)) return;
+    if (!(cin >> idx)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
     cout << "Loyalty points: ";
-    if (!(cin >> amt)) return;
-    encourageCat(idx, amt);
+    if (!(cin >> amt)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    try {
+        encourageCat(idx, amt);
+    } catch (const GameException& e) {
+        cout << "Error: " << e.what() << endl;
+    }
 }
 
 void CatOverlord::trainCatEvilInteractive() {
@@ -159,32 +172,58 @@ void CatOverlord::calmCatInteractive() {
 }
 
 void CatOverlord::sendOnMissionInteractive(Humanity& h) {
-    if (cats.empty()) return;
+    if (cats.empty()) {
+        cout << "No cats available for missions!" << endl;
+        return;
+    }
+
     int index = -1;
-    cout << "Select cat for mission: ";
-    if (!(cin >> index)) return;
-    if (index < 0 || index >= (int)cats.size()) throw InvalidCatIndexException(index);
+    cout << "Select cat for mission (0-" << cats.size() - 1 << "): ";
+    if (!(cin >> index)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    if (index < 0 || index >= (int)cats.size()) {
+        cout << "Invalid cat index!" << endl;
+        return;
+    }
 
     vector<Mission> missions = {
         {"Steal Left Socks", 1, 10, 20, 10, 10, 5, 0, Mission::EVIL},
         {"Be Cute for TikTok", 1, 50, 0, 5, 0, 10, 30, Mission::PR}
     };
 
-    for(size_t i=0; i<missions.size(); ++i) cout << i << ". " << missions[i].getName() << endl;
+    cout << "\nAvailable Missions:" << endl;
+    for(size_t i = 0; i < missions.size(); ++i) {
+        cout << i << ". " << missions[i].getName() << endl;
+    }
+
     int mIdx = -1;
     cout << "Mission index: ";
-    if (!(cin >> mIdx)) return;
+    if (!(cin >> mIdx)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
 
     if (mIdx >= 0 && mIdx < (int)missions.size()) {
         if (missions[mIdx].attempt(cats[index])) {
+            cout << "Mission successful!" << endl;
             money += missions[mIdx].getRewardMoney();
             chaosPoints += missions[mIdx].getRewardChaos();
             h.decreaseSuspicion(5);
         } else {
+            cout << "Mission failed! Suspicion increased." << endl;
             h.increaseSuspicion(15);
         }
+
         cats[index].increaseHunger(missions[mIdx].getHungerCost());
         actionPoints--;
+    } else {
+        cout << "Invalid mission index!" << endl;
     }
 }
 

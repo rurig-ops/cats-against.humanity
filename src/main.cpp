@@ -16,7 +16,7 @@ using namespace std;
 int main() {
     // trackere loguri
     GenericTracker<int> moneyLog;
-    GenericTracker<std::string> eventLog;
+    GenericTracker<string> eventLog;
     eventLog.log("game session started");
 
     // setare dificultate
@@ -42,29 +42,26 @@ int main() {
             overlord.addCat(Cat(name, ev, c, h, l));
         }
         fin.close();
+    } else {
+        cout << "eroare: nu am gasit fisierul cats.txt!" << endl;
     }
 
+    // sortare initiala
     overlord.sortCatsByEvilness();
 
     bool quit = false;
-    // bucla principala
     while (!quit && !humans.isGameOver()) {
-        // stop la eof (fix git)
         if (cin.eof()) break;
 
-        // info status
-        cout << "\n===== status =====" << endl;
+        cout << "\n--- status ---" << endl;
         overlord.printStatus();
         overlord.printCats();
         cout << humans << endl;
 
-        // meniu
-        cout << "\nchoose action:" << endl;
-        cout << "1. feed cat\n2. loyalty\n3. train evil\n4. mission\n5. special\n6. spa\n7. end day\n8. quit" << endl;
+        cout << "\nactions: 1.feed 2.loyalty 3.train 4.mission 5.special 6.spa 7.next day 8.quit" << endl;
         cout << "your choice: ";
 
         int choice = 0;
-        // citire alegere
         if (!(cin >> choice)) {
             if (cin.eof()) break;
             cin.clear();
@@ -76,22 +73,18 @@ int main() {
             switch(choice) {
                 case 1: overlord.feedCatInteractive(); break;
                 case 2: overlord.encourageCatInteractive(); break;
-                case 3:
-                    overlord.trainCatEvilInteractive();
-                    overlord.sortCatsByEvilness();
-                    break;
-                case 4:
-                    overlord.sendOnMissionInteractive(humans);
-                    overlord.sortCatsByEvilness();
-                    break;
+                case 3: overlord.trainCatEvilInteractive(); break;
+                case 4: overlord.sendOnMissionInteractive(humans); break;
                 case 5: {
-                    // polimorfism
                     int ci = -1, ai = -1;
-                    cout << "cat index: "; if (!(cin >> ci)) break;
-                    cout << "action index: " << endl;
+                    cout << "cat index: ";
+                    if (!(cin >> ci)) { cin.clear(); cin.ignore(1000, '\n'); break; }
+
+                    cout << "action index:" << endl;
                     for (size_t i = 0; i < overlord.getNumActions(); i++)
                         cout << i << ". " << overlord.getActions()[i]->name() << "\n";
-                    if (!(cin >> ai)) break;
+
+                    if (!(cin >> ai)) { cin.clear(); cin.ignore(1000, '\n'); break; }
                     overlord.performAction(ci, ai, humans);
                     break;
                 }
@@ -101,7 +94,7 @@ int main() {
                     eventLog.log("day ended");
                     break;
                 case 8: quit = true; break;
-                default: cout << "invalid!" << endl;
+                default: cout << "invalid choice!" << endl;
             }
         } catch (const GameException& e) {
             cout << "error: " << e.what() << endl;
