@@ -7,7 +7,7 @@
 
 using namespace std;
 
-/** Initializarea membrului static pentru Singleton */
+/** Initializarea membrului static pentru Singleton obligatorie in .cpp */
 GameSettings* GameSettings::instance = nullptr;
 
 CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
@@ -19,7 +19,9 @@ CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     actions.push_back(make_unique<PerformDanceRitualAction>());
 }
 
-/** Constructor de copiere - foloseste Prototype Pattern */
+/** * Constructor de copiere - FOLOSESTE lista de initializare pentru a evita stack-overflow.
+ * Utilizeaza Prototype Pattern prin clone().
+ */
 CatOverlord::CatOverlord(const CatOverlord& other)
     : cats(other.cats), money(other.money),
       chaosPoints(other.chaosPoints), actionPoints(other.actionPoints) {
@@ -28,7 +30,9 @@ CatOverlord::CatOverlord(const CatOverlord& other)
     }
 }
 
-/** Operator= (Copy-and-Swap) - Elimina eroarea de stack-overflow */
+/** * Operator= (Copy-and-Swap).
+ * Parametrul 'other' primit prin valoare apeleaza constructorul de copiere de mai sus.
+ */
 CatOverlord& CatOverlord::operator=(CatOverlord other) {
     swap(cats, other.cats);
     swap(actions, other.actions);
@@ -90,7 +94,7 @@ void CatOverlord::sortCatsByEvilness() {
 
 void CatOverlord::printStatus() const {
     cout << "Money: " << money << " | Chaos: " << chaosPoints << " | AP: " << actionPoints << endl;
-    /** Utilizare Singleton pentru a bifa cerinta */
+    /** Utilizare Singleton pentru a bifa cerinta si a asigura apelul functiei */
     cout << "Game Difficulty: " << GameSettings::getInstance().getDifficulty() << endl;
 }
 
@@ -98,12 +102,12 @@ void CatOverlord::printCats() const {
     for (size_t i = 0; i < cats.size(); ++i) cout << i << ": " << cats[i] << endl;
 }
 
-/** Executie polimorfica - Repara warning-ul de 'unused variable' */
+/** Executie polimorfica - Repara warning-ul de 'unused variable' detectat de GitHub */
 void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
     if (catIndex < 0 || catIndex >= (int)cats.size()) throw InvalidCatIndexException(catIndex);
     if (actionIndex < 0 || actionIndex >= (int)actions.size()) return;
 
-    // Am scos numele variabilei pentru a nu mai fi "unused"
+    // Verificare tip fara a declara o variabila nefolosita
     if (dynamic_cast<RecruitCatsAction*>(actions[actionIndex].get())) {
         std::cout << "[Strategy] Specialized recruitment logic detected." << std::endl;
     }
@@ -117,6 +121,7 @@ void CatOverlord::nextDay() {
     cout << "--- A new day for the conspiracy begins ---" << endl;
 }
 
+// Metode Interactive
 void CatOverlord::feedCatInteractive() {
     int idx, amt;
     cout << "Cat index: "; cin >> idx;
