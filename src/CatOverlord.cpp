@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// Initializare statica obligatorie pentru Singleton
 GameSettings* GameSettings::instance = nullptr;
 
 CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
@@ -18,13 +19,17 @@ CatOverlord::CatOverlord(int startMoney, int startChaos, int startAP)
     actions.push_back(make_unique<PerformDanceRitualAction>());
 }
 
-// FIX: Constructor de copiere care actualizeaza pointerii interni
+/**
+ * Constructor de copiere corectat pentru Prototype Pattern.
+ * Previne Stack Overflow prin re-ancorarea pointerului catre noul obiect 'this'.
+ */
 CatOverlord::CatOverlord(const CatOverlord& other)
     : cats(other.cats), money(other.money),
       chaosPoints(other.chaosPoints), actionPoints(other.actionPoints) {
     for (const auto& a : other.actions) {
         auto clona = a->clone();
-        // Daca actiunea este de recrutare, trebuie sa pointeze catre NOUL overlord (this)
+
+        // Fix pentru RecruitCatsAction: trebuie sa puncteze la noul Overlord, nu la cel vechi
         auto recruitPtr = dynamic_cast<RecruitCatsAction*>(clona.get());
         if (recruitPtr) {
             recruitPtr->setOverlord(this);
@@ -33,6 +38,10 @@ CatOverlord::CatOverlord(const CatOverlord& other)
     }
 }
 
+/**
+ * Operatorul de atribuire folosind Copy-and-Swap.
+ * Parametrul 'other' este primit prin valoare, declansand constructorul de copiere de mai sus.
+ */
 CatOverlord& CatOverlord::operator=(CatOverlord other) {
     swap(cats, other.cats);
     swap(actions, other.actions);
@@ -83,6 +92,7 @@ void CatOverlord::sendCatToSpa(int i, int cost) {
     cats[i].increaseCuteness(15);
     money -= cost;
     actionPoints--;
+    cout << cats[i].getName() << " is now relaxed. :3" << endl;
 }
 
 void CatOverlord::sortCatsByEvilness() {
@@ -93,7 +103,7 @@ void CatOverlord::sortCatsByEvilness() {
 
 void CatOverlord::printStatus() const {
     cout << "Money: " << money << " | Chaos: " << chaosPoints << " | AP: " << actionPoints << endl;
-    cout << "Game Difficulty: " << GameSettings::getInstance().getDifficulty() << endl;
+    cout << "Difficulty: " << GameSettings::getInstance().getDifficulty() << endl;
 }
 
 void CatOverlord::printCats() const {
@@ -110,36 +120,48 @@ void CatOverlord::performAction(int catIndex, int actionIndex, Humanity& h) {
 void CatOverlord::nextDay() {
     actionPoints = 6;
     for (auto& c : cats) c.increaseHunger(5);
-    cout << "--- A new day for the conspiracy begins ---" << endl;
+    cout << "--- A new day has dawned for the feline empire ---" << endl;
 }
 
+// METODE INTERACTIVE - Repara Cppcheck prin initializarea variabilelor
 void CatOverlord::feedCatInteractive() {
-    int idx, amt;
-    if (!(cin >> idx >> amt)) return;
+    int idx = -1, amt = 0;
+    cout << "Cat index: ";
+    if (!(cin >> idx)) return;
+    cout << "Food amount ($): ";
+    if (!(cin >> amt)) return;
     feedCat(idx, amt);
 }
 
 void CatOverlord::encourageCatInteractive() {
-    int idx, amt;
-    if (!(cin >> idx >> amt)) return;
+    int idx = -1, amt = 0;
+    cout << "Cat index: ";
+    if (!(cin >> idx)) return;
+    cout << "Loyalty points: ";
+    if (!(cin >> amt)) return;
     encourageCat(idx, amt);
 }
 
 void CatOverlord::trainCatEvilInteractive() {
-    int idx, amt;
-    if (!(cin >> idx >> amt)) return;
+    int idx = -1, amt = 0;
+    cout << "Cat index: ";
+    if (!(cin >> idx)) return;
+    cout << "Training cost ($): ";
+    if (!(cin >> amt)) return;
     trainCatEvil(idx, amt);
 }
 
 void CatOverlord::calmCatInteractive() {
-    int idx;
+    int idx = -1;
+    cout << "Cat to send to spa index: ";
     if (!(cin >> idx)) return;
     sendCatToSpa(idx, 15);
 }
 
 void CatOverlord::sendOnMissionInteractive(Humanity& h) {
     if (cats.empty()) return;
-    int index;
+    int index = -1;
+    cout << "Select cat for mission: ";
     if (!(cin >> index)) return;
     if (index < 0 || index >= (int)cats.size()) throw InvalidCatIndexException(index);
 
@@ -149,7 +171,8 @@ void CatOverlord::sendOnMissionInteractive(Humanity& h) {
     };
 
     for(size_t i=0; i<missions.size(); ++i) cout << i << ". " << missions[i].getName() << endl;
-    int mIdx;
+    int mIdx = -1;
+    cout << "Mission index: ";
     if (!(cin >> mIdx)) return;
 
     if (mIdx >= 0 && mIdx < (int)missions.size()) {
@@ -166,6 +189,6 @@ void CatOverlord::sendOnMissionInteractive(Humanity& h) {
 }
 
 ostream& operator<<(ostream& os, const CatOverlord& o) {
-    os << "Overlord with " << (int)o.cats.size() << " cats.";
+    os << "Overlord presiding over " << o.cats.size() << " operatives.";
     return os;
 }
